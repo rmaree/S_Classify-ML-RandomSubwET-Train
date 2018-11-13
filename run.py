@@ -150,7 +150,7 @@ def main(argv):
         pyxit.fit(x, y)
 
         cj.job.update(progress=90, statusComment="Save model....")
-        model_filename = joblib.dump(pyxit, os.path.join(base_path, "model.joblib"))[0]
+        model_filename = joblib.dump(pyxit, os.path.join(base_path, "model.joblib"), compress=3)[0]
 
         AttachedFile(
             cj.job,
