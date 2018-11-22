@@ -41,23 +41,21 @@ def stringify(l):
 
 
 def parse_domain_list(s):
-    if s is None:
+    if s is None or len(s) == 0:
         return []
-    return map(int, s.split(','))
+    return list(map(int, s.split(',')))
 
 
 def get_annotations(id_project, images=None, terms=None, users=None, reviewed=False, **kwargs):
     annotations = AnnotationCollection(
-        filters={"project": id_project},
-        images=images, term=terms, users=users,
-        showTerm=True, **kwargs
+        project=id_project, images=images, term=terms,
+        users=users, showTerm=True, **kwargs
     ).fetch()
 
     if reviewed:
         annotations += AnnotationCollection(
-            filters={"project": id_project},
-            images=images, terms=terms, users=users, reviewed=True,
-            showTerm=True, **kwargs
+            project=id_project, images=images, term=terms,
+            users=users, reviewed=True, showTerm=True, **kwargs
         ).fetch()
 
     return annotations
@@ -66,16 +64,20 @@ def get_annotations(id_project, images=None, terms=None, users=None, reviewed=Fa
 def main(argv):
     with CytomineJob.from_cli(argv) as cj:
         # annotation filtering
-        cj.logger.info(cj.parameters)
+        cj.logger.info(str(cj.parameters))
 
         cj.job.update(progress=1, statuscomment="Preparing execution (creating folders,...).")
         base_path = "/data"
         images_path = os.path.join(
             base_path, "images", "train",
             "zoom_level", str(cj.parameters.cytomine_zoom_level),
-            "alpha", str(cj.parameters.cytomine_download_alpha)
+            "alpha", str(int(cj.parameters.cytomine_download_alpha))
         )
         ls_path = os.path.join(images_path, "train")
+
+        if os.path.exists(ls_path):
+            import shutil
+            shutil.rmtree(ls_path)
         os.makedirs(ls_path)
 
         cj.job.update(progress=2, statusComment="Fetching annotations...")
@@ -84,7 +86,7 @@ def main(argv):
             "images": parse_domain_list(cj.parameters.cytomine_id_images),
             "users": parse_domain_list(cj.parameters.cytomine_id_users)
         }
-        projects = cj.parameters.cytomine_id_projects
+        projects = parse_domain_list(cj.parameters.cytomine_id_projects)
         if projects is None or len(projects) == 0:  # if projects is missing, fetch only from current project
             projects = [cj.project.id]
 
@@ -98,15 +100,22 @@ def main(argv):
         cj.job.update(progress=2, statusComment="Fetching images in {}...".format(images_path))
         filenames = list()
         terms = list()
-        for annotation in cj.monitor(annotations, start=20, end=50, period=0.05, prefix="Download crops of annotations"):
-            annotation.dump(
-                dest_pattern=os.path.join(ls_path, "{term}", "{image}_{id}.png"),
-                override=True,
-                alpha=cj.parameters.cytomine_download_alpha,
-                zoom=cj.parameters.cytomine_zoom_level
-            )
-            terms.append(annotation.term)
-            filenames.append(annotation.filename)
+        for annotation in cj.monitor(annotations, start=20, end=50, period=200, prefix="Download crops of annotations"):
+            for term in annotation.term:
+                dump_params = {
+                    "dest_pattern": os.path.join(ls_path, str(term), "{image}_{id}.png"),
+                    "override": True,
+                    "alpha": cj.parameters.cytomine_download_alpha,
+                    "zoom": cj.parameters.cytomine_zoom_level
+                }
+                if annotation.dump(**dump_params):
+                    terms.append(term)
+                    filenames.append(os.path.join(
+                        ls_path,
+                        dump_params["dest_pattern"].format(image=annotation.image, id=annotation.id)
+                    ))
+                else:
+                    cj.logger.error("Failed to download crop for annotation {} (term={})".format(annotation.id, term))
 
         cj.logger.info("Downloaded a total of {} crops(s)...".format(len(filenames)))
         x = np.array(filenames)
@@ -137,10 +146,10 @@ def main(argv):
             transpose=cj.parameters.pyxit_transpose,
             colorspace=cj.parameters.pyxit_colorspace,
             fixed_size=cj.parameters.pyxit_fixed_size,
-            verbose=cj.logger.level,
+            verbose=int(cj.logger.level == 10),
             create_svm=cj.parameters.svm,
             C=cj.parameters.svm_c,
-            random_state=cj.parameters.random_seed,
+            random_state=cj.parameters.seed,
             n_estimators=cj.parameters.forest_n_estimators,
             min_samples_split=cj.parameters.forest_min_samples_split,
             max_features=cj.parameters.forest_max_features,
