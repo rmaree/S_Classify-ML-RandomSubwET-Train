@@ -1,5 +1,5 @@
 {
-  "command-line": "python run.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE WORKING_DIRECTORY SVM_C SVM PYXIT_TRANSPOSE PYXIT_TARGET_WIDTH PYXIT_TARGET_HEIGHT PYXIT_N_SUBWINDOWS PYXIT_MIN_SIZE PYXIT_MAX_SIZE PYXIT_INTERPOLATION PYXIT_FIXED_SIZE PYXIT_COLORSPACE N_JOBS FOREST_N_ESTIMATORS FOREST_MIN_SAMPLES_SPLIT FOREST_MAX_FEATURES CYTOMINE_ZOOM_LEVEL CYTOMINE_ID_USERS CYTOMINE_ID_TERMS CYTOMINE_REVIEWED CYTOMINE_ID_IMAGES CYTOMINE_DOWNLOAD_ALPHA CYTOMINE_ID_PROJECTS CYTOMINE_BINARY SEED CYTOMINE_POSITIVE_TERMS ",
+  "command-line": "python run.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE CYTOMINE_ID_PROJECTS CYTOMINE_ID_USERS CYTOMINE_ID_IMAGES CYTOMINE_ID_TERMS CYTOMINE_REVIEWED CYTOMINE_BINARY CYTOMINE_POSITIVE_TERMS CYTOMINE_DOWNLOAD_ALPHA CYTOMINE_ZOOM_LEVEL N_JOBS SVM_C SEED SVM PYXIT_TRANSPOSE PYXIT_TARGET_WIDTH PYXIT_TARGET_HEIGHT PYXIT_N_SUBWINDOWS PYXIT_MIN_SIZE PYXIT_MAX_SIZE PYXIT_INTERPOLATION PYXIT_FIXED_SIZE PYXIT_COLORSPACE FOREST_N_ESTIMATORS FOREST_MIN_SAMPLES_SPLIT FOREST_MAX_FEATURES ",
   "inputs": [
     {
       "name": "Cytomine host",
@@ -52,13 +52,109 @@
       "command-line-flag": "--@id"
     },
     {
-      "name": "Working directory",
-      "description": "Working directory for the server",
+      "name": "Cytomine projects ids",
+      "description": "(Annotations filtering) Identifiers of projects of which the annotations should be selected for training.",
       "set-by-server": false,
       "value-key": "@ID",
-      "optional": false,
-      "id": "working_directory",
+      "optional": true,
+      "id": "cytomine_id_projects",
       "type": "String",
+      "command-line-flag": "--@id"
+    },
+    {
+      "name": "Cytomine users ids",
+      "description": "(Annotations filtering) Identifiers of users of which the annotations should be selected for training.",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_id_users",
+      "type": "String",
+      "command-line-flag": "--@id"
+    },
+    {
+      "name": "Cytomine images ids",
+      "description": "(Annotations filtering) Identifiers of images of which the annotations should be selected for training.",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_id_images",
+      "type": "String",
+      "command-line-flag": "--@id"
+    },
+    {
+      "name": "Cytomine terms ids",
+      "description": "(Annotations filtering) Identifiers of terms of which the annotations should be selected for training.",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_id_terms",
+      "type": "String",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": "0",
+      "name": "Cytomine reviewed",
+      "description": "(Annotations filtering) Whether (true) or not (false) to include the reviewed annotations in training data.",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_reviewed",
+      "type": "Boolean",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": "0",
+      "name": "Binary classification",
+      "description": "Whether (true) or not (false) to treat the problem as a binary classification or not. If true cytomine_positive_terms should contain the list of terms considered as positive. Otherwise, there will be as many classes as terms.",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_binary",
+      "type": "Boolean",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": "",
+      "name": "Positive terms",
+      "description": "If cytomine_binary is true, contains the ids of the terms that represent the positive class.",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_positive_terms",
+      "type": "String",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": "false",
+      "name": "Download alpha channel",
+      "description": "Whether (true) or not (false) to download the alpha channel with the crops",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_download_alpha",
+      "type": "Boolean",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": 1,
+      "name": "Zoom level",
+      "description": "Zoom level at which the crops should be downloaded",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "cytomine_zoom_level",
+      "type": "Number",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": 1,
+      "name": "Number of jobs",
+      "description": "Number of jobs for training",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "n_jobs",
+      "type": "Number",
       "command-line-flag": "--@id"
     },
     {
@@ -69,6 +165,17 @@
       "value-key": "@ID",
       "optional": true,
       "id": "svm_c",
+      "type": "Number",
+      "command-line-flag": "--@id"
+    },
+    {
+      "default-value": 42,
+      "name": "Random seed",
+      "description": "The random generator integer seed",
+      "set-by-server": false,
+      "value-key": "@ID",
+      "optional": true,
+      "id": "seed",
       "type": "Number",
       "command-line-flag": "--@id"
     },
@@ -183,17 +290,6 @@
       "command-line-flag": "--@id"
     },
     {
-      "default-value": 1,
-      "name": "Number of jobs",
-      "description": "Number of jobs for training",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": false,
-      "id": "n_jobs",
-      "type": "Number",
-      "command-line-flag": "--@id"
-    },
-    {
       "default-value": 10,
       "name": "Forest N Estimators",
       "description": "forest_n_estimators",
@@ -224,113 +320,6 @@
       "optional": true,
       "id": "forest_max_features",
       "type": "Number",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": 1,
-      "name": "Zoom level",
-      "description": "Zoom level at which the crops should be downloaded",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_zoom_level",
-      "type": "Number",
-      "command-line-flag": "--@id"
-    },
-    {
-      "name": "Cytomine users ids",
-      "description": "(Annotations filtering) Identifiers of users of which the annotations should be selected for training.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_id_users",
-      "type": "String",
-      "command-line-flag": "--@id"
-    },
-    {
-      "name": "Cytomine terms ids",
-      "description": "(Annotations filtering) Identifiers of terms of which the annotations should be selected for training.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_id_terms",
-      "type": "String",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": "false",
-      "name": "Cytomine reviewed",
-      "description": "(Annotations filtering) Whether (true) or not (false) to include the reviewed annotations in training data.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_reviewed",
-      "type": "Boolean",
-      "command-line-flag": "--@id"
-    },
-    {
-      "name": "Cytomine images ids",
-      "description": "(Annotations filtering) Identifiers of images of which the annotations should be selected for training.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_id_images",
-      "type": "String",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": "false",
-      "name": "Download alpha channel",
-      "description": "Whether (true) or not (false) to download the alpha channel with the crops",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_download_alpha",
-      "type": "Boolean",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": "",
-      "name": "Cytomine projects ids",
-      "description": "(Annotations filtering) Identifiers of projects of which the annotations should be selected for training.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_id_projects",
-      "type": "String",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": "false",
-      "name": "Binary classification",
-      "description": "Whether (true) or not (false) to treat the problem as a binary classification or not. If true cytomine_positive_terms should contain the list of terms considered as positive. Otherwise, there will be as many classes as terms.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_binary",
-      "type": "String",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": 42,
-      "name": "Random seed",
-      "description": "The random generator integer seed",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "seed",
-      "type": "Number",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": "",
-      "name": "Positive terms",
-      "description": "If cytomine_binary is true, contains the ids of the terms that represent the positive class.",
-      "set-by-server": false,
-      "value-key": "@ID",
-      "optional": true,
-      "id": "cytomine_positive_terms",
-      "type": "String",
       "command-line-flag": "--@id"
     }
   ],
