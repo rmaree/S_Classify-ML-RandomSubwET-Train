@@ -97,35 +97,40 @@ def main(argv):
             cj.logger.info("Downloaded {} annotation(s) so far...".format(len(annotations)))
         cj.logger.info("Downloaded a total of {} annotation(s)...".format(len(annotations)))
 
-        cj.job.update(progress=2, statusComment="Fetching images in {}...".format(images_path))
+        cj.job.update(progress=20, statusComment="Fetching images in {}...".format(images_path))
+        downloaded = annotations.dump_crops(
+            dest_pattern=os.path.join(ls_path, "{term}", "{image}_{id}.png"),
+            override=True, **{
+                "alpha": cj.parameters.cytomine_download_alpha,
+                "zoom": cj.parameters.cytomine_zoom_level
+            })
+
         filenames = list()
         terms = list()
-        for annotation in cj.monitor(annotations, start=20, end=50, period=200, prefix="Download crops of annotations"):
-            for term in annotation.term:
-                dump_params = {
-                    "dest_pattern": os.path.join(ls_path, str(term), "{image}_{id}.png"),
-                    "override": True,
-                    "alpha": cj.parameters.cytomine_download_alpha,
-                    "zoom": cj.parameters.cytomine_zoom_level
-                }
-                if annotation.dump(**dump_params):
-                    terms.append(term)
-                    filenames.append(os.path.join(
-                        ls_path,
-                        dump_params["dest_pattern"].format(image=annotation.image, id=annotation.id)
-                    ))
-                else:
-                    cj.logger.error("Failed to download crop for annotation {} (term={})".format(annotation.id, term))
+        for annotation in downloaded:
+            filenames.extend(annotation.filenames)
+            terms.extend([int(os.path.basename(os.path.dirname(filepath))) for filepath in annotation.filenames])
 
+        cj.job.update(progress=40, statusComment="{} crop(s) fetched...".format(len(filenames)))
         cj.logger.info("Downloaded a total of {} crops(s)...".format(len(filenames)))
         x = np.array(filenames)
         y = np.array(terms)
 
         # transform classes
         cj.job.update(progress=50, statusComment="Transform classes...")
-        classes = np.unique(y)
-        n_classes = len(classes)
+        classes = np.array(filters["terms"]) if len(filters["terms"]) > 0 else np.unique(y)
+        n_classes = classes.shape[0]
         positive_classes = parse_domain_list(cj.parameters.cytomine_positive_terms)
+
+        # filter unwanted terms
+        cj.logger.info("Size before filtering:")
+        cj.logger.info(" - x: {}".format(x.shape))
+        cj.logger.info(" - y: {}".format(y.shape))
+        keep = np.in1d(y, classes)
+        x, y = x[keep], y[keep]
+        cj.logger.info("Size after filtering:")
+        cj.logger.info(" - x: {}".format(x.shape))
+        cj.logger.info(" - y: {}".format(y.shape))
 
         if cj.parameters.cytomine_binary:
             cj.logger.info("Will be training on 2 classes ({} classes before binarization).".format(n_classes))
