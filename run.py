@@ -43,7 +43,6 @@ def main(argv):
             root_path=Path.home(), set_folder="train", showTerm=True
         )
 
-        cj.job.update(progress=40, statusComment="{} crop(s) fetched...".format(len(downloaded)))
         x = np.array([f for annotation in downloaded for f in annotation.filenames])
         y = np.array([int(os.path.basename(os.path.dirname(filepath))) for filepath in x])
 
