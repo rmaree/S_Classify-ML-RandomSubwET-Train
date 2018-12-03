@@ -92,14 +92,14 @@
       "command-line-flag": "--@id"
     },
     {
-      "default-value": "0",
+      "default-value": 0,
       "name": "Cytomine reviewed",
-      "description": "(Annotations filtering) Whether (true) or not (false) to include the reviewed annotations in training data.",
+      "description": "(Annotations filtering) '0' for using regular annotations. '1' for also including reviewed annotations. '2' for using only reviewed annotations.",
       "set-by-server": false,
       "value-key": "@ID",
       "optional": true,
       "id": "cytomine_reviewed",
-      "type": "Boolean",
+      "type": "Number",
       "command-line-flag": "--@id"
     },
     {
