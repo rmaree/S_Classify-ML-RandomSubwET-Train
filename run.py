@@ -15,50 +15,19 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 # */
+from pathlib import Path
 
 __author__          = "Mormont Romain <r.mormont@uliege.be>"
 __contributors__    = ["Marée Raphael <raphael.maree@uliege.be>"]
 __copyright__       = "Copyright 2010-2018 University of Liège, Belgium, http://www.cytomine.org/"
 
-
 import os
-from cytomine.models import *
 import numpy as np
-
-from cytomine import CytomineJob
 from sklearn.externals import joblib
-
+from cytomine.models import *
+from cytomine import CytomineJob
+from cytomine.utilities.software import setup_classify, parse_domain_list, stringify
 from pyxit import build_models
-
-
-
-def str2bool(v):
-        return v.lower() in ("yes", "true", "t", "1")
-
-
-def stringify(l):
-    return ",".join(map(str, l))
-
-
-def parse_domain_list(s):
-    if s is None or len(s) == 0:
-        return []
-    return list(map(int, s.split(',')))
-
-
-def get_annotations(id_project, images=None, terms=None, users=None, reviewed=False, **kwargs):
-    annotations = AnnotationCollection(
-        project=id_project, images=images, term=terms,
-        users=users, showTerm=True, **kwargs
-    ).fetch()
-
-    if reviewed:
-        annotations += AnnotationCollection(
-            project=id_project, images=images, term=terms,
-            users=users, reviewed=True, showTerm=True, **kwargs
-        ).fetch()
-
-    return annotations
 
 
 def main(argv):
@@ -67,60 +36,22 @@ def main(argv):
         cj.logger.info(str(cj.parameters))
 
         cj.job.update(progress=1, statuscomment="Preparing execution (creating folders,...).")
-        base_path = "/data"
-        images_path = os.path.join(
-            base_path, "images", "train",
-            "zoom_level", str(cj.parameters.cytomine_zoom_level),
-            "alpha", str(int(cj.parameters.cytomine_download_alpha))
+        base_path, downloaded = setup_classify(
+            args=cj.parameters, logger=cj.job_logger(1, 40),
+            root_path=Path.home(), set_folder="train",
+            showTerm=True
         )
-        ls_path = os.path.join(images_path, "train")
 
-        if os.path.exists(ls_path):
-            import shutil
-            shutil.rmtree(ls_path)
-        os.makedirs(ls_path)
-
-        cj.job.update(progress=2, statusComment="Fetching annotations...")
-        filters = {
-            "terms": parse_domain_list(cj.parameters.cytomine_id_terms),
-            "images": parse_domain_list(cj.parameters.cytomine_id_images),
-            "users": parse_domain_list(cj.parameters.cytomine_id_users)
-        }
-        projects = parse_domain_list(cj.parameters.cytomine_id_projects)
-        if projects is None or len(projects) == 0:  # if projects is missing, fetch only from current project
-            projects = [cj.project.id]
-
-        annotations = AnnotationCollection()
-
-        for id_project in cj.monitor(projects, start=2, end=20, period=0.1, prefix="Download annotations from project"):
-            annotations += get_annotations(id_project, **filters, reviewed=cj.parameters.cytomine_reviewed, showTerms=True)
-            cj.logger.info("Downloaded {} annotation(s) so far...".format(len(annotations)))
-        cj.logger.info("Downloaded a total of {} annotation(s)...".format(len(annotations)))
-
-        cj.job.update(progress=20, statusComment="Fetching images in {}...".format(images_path))
-        downloaded = annotations.dump_crops(
-            dest_pattern=os.path.join(ls_path, "{term}", "{image}_{id}.png"),
-            override=True, **{
-                "alpha": cj.parameters.cytomine_download_alpha,
-                "zoom": cj.parameters.cytomine_zoom_level
-            })
-
-        filenames = list()
-        terms = list()
-        for annotation in downloaded:
-            filenames.extend(annotation.filenames)
-            terms.extend([int(os.path.basename(os.path.dirname(filepath))) for filepath in annotation.filenames])
-
-        cj.job.update(progress=40, statusComment="{} crop(s) fetched...".format(len(filenames)))
-        cj.logger.info("Downloaded a total of {} crops(s)...".format(len(filenames)))
-        x = np.array(filenames)
-        y = np.array(terms)
+        cj.job.update(progress=40, statusComment="{} crop(s) fetched...".format(len(downloaded)))
+        x = np.array([f for annotation in downloaded for f in annotation.filenames])
+        y = np.array([int(os.path.basename(os.path.dirname(filepath))) for filepath in x])
 
         # transform classes
         cj.job.update(progress=50, statusComment="Transform classes...")
-        classes = np.array(filters["terms"]) if len(filters["terms"]) > 0 else np.unique(y)
-        n_classes = classes.shape[0]
+        classes = parse_domain_list(cj.parameters.cytomine_id_terms)
         positive_classes = parse_domain_list(cj.parameters.cytomine_positive_terms)
+        classes = np.array(classes) if len(classes) > 0 else np.unique(y)
+        n_classes = classes.shape[0]
 
         # filter unwanted terms
         cj.logger.info("Size before filtering:")
@@ -174,6 +105,7 @@ def main(argv):
         ).upload()
 
         Property(cj.job, key="classes", value=stringify(classes)).save()
+        Property(cj.job, key="binary", value=cj.parameters.cytomine_binary).save()
         Property(cj.job, key="positive_classes", value=stringify(positive_classes)).save()
 
         cj.job.update(status=Job.TERMINATED, status_comment="Finish", progress=100)
