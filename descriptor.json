@@ -52,6 +52,7 @@
       "command-line-flag": "--@id"
     },
     {
+      "default-value": "",
       "name": "Cytomine projects ids",
       "description": "(Annotations filtering) Identifiers of projects of which the annotations should be selected for training.",
       "set-by-server": false,
@@ -62,6 +63,7 @@
       "command-line-flag": "--@id"
     },
     {
+      "default-value": "",
       "name": "Cytomine users ids",
       "description": "(Annotations filtering) Identifiers of users of which the annotations should be selected for training.",
       "set-by-server": false,
@@ -72,6 +74,7 @@
       "command-line-flag": "--@id"
     },
     {
+      "default-value": "",
       "name": "Cytomine images ids",
       "description": "(Annotations filtering) Identifiers of images of which the annotations should be selected for training.",
       "set-by-server": false,
@@ -82,6 +85,7 @@
       "command-line-flag": "--@id"
     },
     {
+      "default-value": "",
       "name": "Cytomine terms ids",
       "description": "(Annotations filtering) Identifiers of terms of which the annotations should be selected for training.",
       "set-by-server": false,
