@@ -39,8 +39,8 @@ def main(argv):
         cj.job.update(progress=1, statuscomment="Preparing execution (creating folders,...).")
         base_path, downloaded = setup_classify(
             args=cj.parameters, logger=cj.job_logger(1, 40),
-            root_path=Path.home(), set_folder="train",
-            showTerm=True
+            dest_pattern=os.path.join("{term}", "{image}_{id}.png"),
+            root_path=Path.home(), set_folder="train", showTerm=True
         )
 
         cj.job.update(progress=40, statusComment="{} crop(s) fetched...".format(len(downloaded)))
