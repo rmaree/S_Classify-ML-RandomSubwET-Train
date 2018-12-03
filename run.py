@@ -15,14 +15,15 @@
 # * See the License for the specific language governing permissions and
 # * limitations under the License.
 # */
-from pathlib import Path
+
 
 __author__          = "Mormont Romain <r.mormont@uliege.be>"
-__contributors__    = ["Marée Raphael <raphael.maree@uliege.be>"]
 __copyright__       = "Copyright 2010-2018 University of Liège, Belgium, http://www.cytomine.org/"
+
 
 import os
 import numpy as np
+from pathlib import Path
 from sklearn.externals import joblib
 from cytomine.models import *
 from cytomine import CytomineJob
