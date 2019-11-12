@@ -331,7 +331,7 @@
   "description": "A Cytomine software for classifying crops with Random subwindows and ExtraTrees (training). All images are downloaded to the \u0027/data\u0027 folder.",
   "schema-version": "cytomine-0.1",
   "container-image": {
-    "image": "cytomine-uliege/s_classify-ml-randomsubwet-train",
+    "image": "cytomineuliege/s_classify-ml-randomsubwet-train",
     "type": "singularity"
   }
 }
