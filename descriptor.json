@@ -1,5 +1,5 @@
 {
-  "command-line": "python run.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE CYTOMINE_PROJECTS CYTOMINE_ID_USERS CYTOMINE_ID_IMAGES CYTOMINE_ID_TERMS CYTOMINE_REVIEWED CYTOMINE_BINARY CYTOMINE_POSITIVE_TERMS CYTOMINE_DOWNLOAD_ALPHA CYTOMINE_ZOOM_LEVEL N_JOBS SVM_C SEED SVM PYXIT_TRANSPOSE PYXIT_TARGET_WIDTH PYXIT_TARGET_HEIGHT PYXIT_N_SUBWINDOWS PYXIT_MIN_SIZE PYXIT_MAX_SIZE PYXIT_INTERPOLATION PYXIT_FIXED_SIZE PYXIT_COLORSPACE FOREST_N_ESTIMATORS FOREST_MIN_SAMPLES_SPLIT FOREST_MAX_FEATURES ",
+  "command-line": "python run.py CYTOMINE_HOST CYTOMINE_PUBLIC_KEY CYTOMINE_PRIVATE_KEY CYTOMINE_ID_PROJECT CYTOMINE_ID_SOFTWARE CYTOMINE_ID_USERS CYTOMINE_ID_IMAGES CYTOMINE_ID_TERMS CYTOMINE_REVIEWED CYTOMINE_BINARY CYTOMINE_POSITIVE_TERMS CYTOMINE_DOWNLOAD_ALPHA CYTOMINE_ZOOM_LEVEL N_JOBS SVM_C SEED SVM PYXIT_TRANSPOSE PYXIT_TARGET_WIDTH PYXIT_TARGET_HEIGHT PYXIT_N_SUBWINDOWS PYXIT_MIN_SIZE PYXIT_MAX_SIZE PYXIT_INTERPOLATION PYXIT_FIXED_SIZE PYXIT_COLORSPACE FOREST_N_ESTIMATORS FOREST_MIN_SAMPLES_SPLIT FOREST_MAX_FEATURES ",
   "inputs": [
     {
       "name": "Cytomine host",
@@ -53,24 +53,14 @@
     },
     {
       "default-value": "",
-      "name": "Cytomine projects ids",
-      "description": "(Annotations filtering) Identifiers of projects of which the annotations should be selected for training.",
-      "set-by-server": false,
-      "value-key": "CYTOMINE_PROJECTS",
-      "optional": true,
-      "id": "cytomine_id_projects",
-      "type": "String",
-      "command-line-flag": "--@id"
-    },
-    {
-      "default-value": "",
       "name": "Cytomine users ids",
       "description": "(Annotations filtering) Identifiers of users of which the annotations should be selected for training.",
       "set-by-server": false,
       "value-key": "@ID",
       "optional": true,
       "id": "cytomine_id_users",
-      "type": "String",
+      "type": "ListDomain",
+      "uri": "/api/project/$currentProject$/user.json",
       "command-line-flag": "--@id"
     },
     {
@@ -81,7 +71,8 @@
       "value-key": "@ID",
       "optional": true,
       "id": "cytomine_id_images",
-      "type": "String",
+      "type": "ListDomain",
+      "uri": "/api/project/$currentProject$/imageinstance.json",
       "command-line-flag": "--@id"
     },
     {
@@ -92,7 +83,8 @@
       "value-key": "@ID",
       "optional": true,
       "id": "cytomine_id_terms",
-      "type": "String",
+      "type": "ListDomain",
+      "uri": "/api/project/$currentProject$/term.json",
       "command-line-flag": "--@id"
     },
     {
@@ -107,7 +99,7 @@
       "command-line-flag": "--@id"
     },
     {
-      "default-value": "0",
+      "default-value": false,
       "name": "Binary classification",
       "description": "Whether (true) or not (false) to treat the problem as a binary classification or not. If true cytomine_positive_terms should contain the list of terms considered as positive. Otherwise, there will be as many classes as terms.",
       "set-by-server": false,
@@ -125,11 +117,12 @@
       "value-key": "@ID",
       "optional": true,
       "id": "cytomine_positive_terms",
-      "type": "String",
+      "type": "ListDomain",
+      "uri": "/api/project/$currentProject$/term.json",
       "command-line-flag": "--@id"
     },
     {
-      "default-value": "false",
+      "default-value": false,
       "name": "Download alpha channel",
       "description": "Whether (true) or not (false) to download the alpha channel with the crops",
       "set-by-server": false,
