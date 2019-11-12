@@ -305,7 +305,7 @@
       "command-line-flag": "--@id"
     },
     {
-      "default-value": 1,
+      "default-value": 2,
       "name": "Forest Min Samples Split",
       "description": "forest_min_samples_split",
       "set-by-server": false,
