@@ -61,6 +61,7 @@
       "id": "cytomine_id_users",
       "type": "ListDomain",
       "uri": "/api/project/$currentProject$/user.json",
+      "uri-print-attribute": "username",
       "command-line-flag": "--@id"
     },
     {
@@ -73,6 +74,7 @@
       "id": "cytomine_id_images",
       "type": "ListDomain",
       "uri": "/api/project/$currentProject$/imageinstance.json",
+      "uri-print-attribute": "instanceFilename",
       "command-line-flag": "--@id"
     },
     {
@@ -85,6 +87,7 @@
       "id": "cytomine_id_terms",
       "type": "ListDomain",
       "uri": "/api/project/$currentProject$/term.json",
+      "uri-print-attribute": "name",
       "command-line-flag": "--@id"
     },
     {
@@ -119,6 +122,7 @@
       "id": "cytomine_positive_terms",
       "type": "ListDomain",
       "uri": "/api/project/$currentProject$/term.json",
+      "uri-print-attribute": "name",
       "command-line-flag": "--@id"
     },
     {
