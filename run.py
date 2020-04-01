@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # /**
-# * Copyright (c) 2009-2018.
+# * Copyright (c) 2009-2020.
 # *
 # * Licensed under the Apache License, Version 2.0 (the "License");
 # * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 
 __author__          = "Mormont Romain <r.mormont@uliege.be>"
-__copyright__       = "Copyright 2010-2018 University of Liège, Belgium, http://www.cytomine.org/"
+__copyright__       = "Copyright 2010-2020 University of Liège, Belgium, http://www.cytomine.org/"
 
 
 import os
