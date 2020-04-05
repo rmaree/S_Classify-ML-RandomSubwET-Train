@@ -13,3 +13,6 @@ Also attached as job properties:
 # See also
 
 [Pyxit implementation](https://github.com/Cytomine-ULiege/pyxit)
+
+# Thanks to
+This software is a contribution from the [ULiège Cytomine research team](https://uliege.cytomine.org/)
