@@ -1,5 +1,5 @@
 # S_Classify-ML-RandomSubwET-Train
-A Cytomine software for classifying crops with Random subwindows and ExtraTrees. 
+A Cytomine software for classifying crops with Random subwindows and ExtraTrees (Marée et al., Pattern recognition letters 2017, http://orbi.ulg.ac.be/handle/2268/191267). 
 
 All images and related data are downloaded to the `/data` folder of the container.
 
